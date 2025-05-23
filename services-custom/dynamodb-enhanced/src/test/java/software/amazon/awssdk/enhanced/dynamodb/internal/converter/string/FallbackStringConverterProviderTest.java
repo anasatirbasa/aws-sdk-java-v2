@@ -9,16 +9,16 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.util.HashMap;
+import java.time.LocalDate;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 import software.amazon.awssdk.enhanced.dynamodb.EnhancedType;
+import software.amazon.awssdk.enhanced.dynamodb.functionaltests.models.CustomType;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.StringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.StringConverterProvider;
-import software.amazon.awssdk.enhanced.dynamodb.model.Record;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FallbackStringConverterProviderTest {
@@ -35,69 +35,71 @@ public class FallbackStringConverterProviderTest {
 
     @Test
     public void testUsesDelegateWhenAvailable() {
-        EnhancedType<Record> type = EnhancedType.of(Record.class);
-        StringConverter<Record> mockConverter = mock(StringConverter.class);
+        EnhancedType<CustomType> type = EnhancedType.of(CustomType.class);
+        StringConverter<CustomType> mockConverter = mock(StringConverter.class);
         when(mockConverter.toString(any())).thenReturn("mock-serialized-result");
         when(mockDelegate.converterFor(type)).thenReturn(mockConverter);
 
-        StringConverter<Record> result = fallbackProvider.converterFor(type);
-        assertEquals("mock-serialized-result", result.toString(createRecord()));
+        StringConverter<CustomType> result = fallbackProvider.converterFor(type);
+        assertEquals("mock-serialized-result", result.toString(createCustomType()));
         verify(mockDelegate).converterFor(type);
     }
 
     @Test
     public void testFallbackSerializationDeserialization() {
-        EnhancedType<Record> type = EnhancedType.of(Record.class);
+        EnhancedType<CustomType> type = EnhancedType.of(CustomType.class);
         when(mockDelegate.converterFor(type)).thenThrow(new IllegalArgumentException("Not found"));
 
-        StringConverter<Record> converter = fallbackProvider.converterFor(type);
-        Record original = createRecord();
+        StringConverter<CustomType> converter = fallbackProvider.converterFor(type);
+        CustomType original = createCustomType();
         String json = converter.toString(original);
-        Record parsed = converter.fromString(json);
+        CustomType parsed = converter.fromString(json);
 
         assertNotNull(json);
         assertNotNull(parsed);
-        assertEquals(original.getId(), parsed.getId());
-        assertEquals(original.getAttributesMap(), parsed.getAttributesMap());
+        assertEquals(original.getBooleanAttribute(), parsed.getBooleanAttribute());
+        assertEquals(original.getIntegerAttribute(), parsed.getIntegerAttribute());
+        assertEquals(original.getDoubleAttribute(), parsed.getDoubleAttribute());
+        assertEquals(original.getStringAttribute(), parsed.getStringAttribute());
+        assertEquals(original.getLocalDateAttribute(), parsed.getLocalDateAttribute());
     }
 
     @Test
     public void testFallbackCaching() {
-        EnhancedType<Record> type = EnhancedType.of(Record.class);
+        EnhancedType<CustomType> type = EnhancedType.of(CustomType.class);
         when(mockDelegate.converterFor(type)).thenThrow(new IllegalArgumentException("Not found"));
 
-        StringConverter<Record> first = fallbackProvider.converterFor(type);
-        StringConverter<Record> second = fallbackProvider.converterFor(type);
+        StringConverter<CustomType> first = fallbackProvider.converterFor(type);
+        StringConverter<CustomType> second = fallbackProvider.converterFor(type);
 
         assertSame(first, second);
     }
 
     @Test
     public void testFallbackHandlesNull() {
-        EnhancedType<Record> type = EnhancedType.of(Record.class);
+        EnhancedType<CustomType> type = EnhancedType.of(CustomType.class);
         when(mockDelegate.converterFor(type)).thenThrow(new IllegalArgumentException("Not found"));
 
-        StringConverter<Record> converter = fallbackProvider.converterFor(type);
+        StringConverter<CustomType> converter = fallbackProvider.converterFor(type);
         assertNull(converter.toString(null));
         assertNull(converter.fromString(null));
     }
 
     @Test
     public void testFallbackReturnsNullOnMalformedJson() {
-        EnhancedType<Record> type = EnhancedType.of(Record.class);
+        EnhancedType<CustomType> type = EnhancedType.of(CustomType.class);
         when(mockDelegate.converterFor(type)).thenThrow(new IllegalArgumentException("Not found"));
 
-        StringConverter<Record> converter = fallbackProvider.converterFor(type);
+        StringConverter<CustomType> converter = fallbackProvider.converterFor(type);
         assertNull(converter.fromString("{invalid"));
     }
 
-    private Record createRecord() {
-        return new Record()
-            .setId("123")
-            .setAttributesMap(new HashMap<String, String>() {{
-                put("mapAttribute1", "mapValue1");
-                put("mapAttribute2", "mapValue2");
-                put("mapAttribute3", "mapValue3");
-            }});
+    private CustomType createCustomType() {
+        return new CustomType()
+            .setBooleanAttribute(Boolean.TRUE)
+            .setIntegerAttribute(1)
+            .setDoubleAttribute(100.0)
+            .setStringAttribute("test1")
+            .setLocalDateAttribute(LocalDate.of(2025, 1, 1));
     }
 }

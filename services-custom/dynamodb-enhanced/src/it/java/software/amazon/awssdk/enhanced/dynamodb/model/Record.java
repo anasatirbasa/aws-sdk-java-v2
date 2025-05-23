@@ -15,7 +15,6 @@
 
 package software.amazon.awssdk.enhanced.dynamodb.model;
 
-import java.util.Map;
 import java.util.Objects;
 
 public class Record {
@@ -27,8 +26,6 @@ public class Record {
     private Integer gsiSort;
 
     private String stringAttribute;
-
-    private Map<String, String> attributesMap;
 
     public String getId() {
         return id;
@@ -84,15 +81,6 @@ public class Record {
         return this;
     }
 
-    public Map<String, String> getAttributesMap() {
-        return attributesMap;
-    }
-
-    public Record setAttributesMap(Map<String, String> attributesMap) {
-        this.attributesMap = attributesMap;
-        return this;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -103,12 +91,11 @@ public class Record {
                Objects.equals(value, record.value) &&
                Objects.equals(gsiId, record.gsiId) &&
                Objects.equals(stringAttribute, record.stringAttribute) &&
-               Objects.equals(gsiSort, record.gsiSort) &&
-               Objects.equals(attributesMap, record.attributesMap);
+               Objects.equals(gsiSort, record.gsiSort);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, sort, value, gsiId, gsiSort, stringAttribute, attributesMap);
+        return Objects.hash(id, sort, value, gsiId, gsiSort, stringAttribute);
     }
 }
