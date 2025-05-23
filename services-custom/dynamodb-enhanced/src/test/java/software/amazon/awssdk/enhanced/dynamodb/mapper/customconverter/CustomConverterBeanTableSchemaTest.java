@@ -156,7 +156,7 @@ public class CustomConverterBeanTableSchemaTest {
     public void serializeBean_withCustomMapKey_CorrectlyPerformSerialization() {
         CustomConverterBean customConverterBean = new CustomConverterBean()
             .setId("1")
-            .setCustomKeyMap(buildCustomKeyMap());
+            .setCustomKeyMap(buildMapWithCustomKey());
 
         BeanTableSchema<CustomConverterBean> beanTableSchema = BeanTableSchema.create(CustomConverterBean.class);
         Map<String, AttributeValue> itemMap = beanTableSchema.itemToMap(customConverterBean, true);
@@ -189,14 +189,14 @@ public class CustomConverterBeanTableSchemaTest {
         CustomConverterBean result = beanTableSchema.mapToItem(itemMap);
 
         assertThat(result.getId(), is("1"));
-        assertThat(result.getCustomKeyMap(), equalTo(buildCustomKeyMap()));
+        assertThat(result.getCustomKeyMap(), equalTo(buildMapWithCustomKey()));
     }
 
     @Test
     public void serializeBean_withCustomMapValue_CorrectlyPerformSerialization() {
         CustomConverterBean customConverterBean = new CustomConverterBean()
             .setId("1")
-            .setCustomValueMap(buildCustomValueMap());
+            .setCustomValueMap(buildMapWithCustomValue());
 
         BeanTableSchema<CustomConverterBean> beanTableSchema = BeanTableSchema.create(CustomConverterBean.class);
         Map<String, AttributeValue> itemMap = beanTableSchema.itemToMap(customConverterBean, true);
@@ -239,7 +239,7 @@ public class CustomConverterBeanTableSchemaTest {
         CustomConverterBean result = beanTableSchema.mapToItem(itemMap);
 
         assertThat(result.getId(), is("1"));
-        assertThat(result.getCustomValueMap(), equalTo(buildCustomValueMap()));
+        assertThat(result.getCustomValueMap(), equalTo(buildMapWithCustomValue()));
     }
 
     @Test
@@ -290,22 +290,22 @@ public class CustomConverterBeanTableSchemaTest {
     }
 
     private Set<CustomType> buildCustomSet() {
-        return new HashSet<>(Arrays.asList(buildFirstCustomTypeElement(), buildSecondCustomTypeElement()));
+        return new HashSet<>(Arrays.asList(buildFirstCustomElement(), buildSecondCustomElement()));
     }
 
     private List<CustomType> buildCustomList() {
-        return new ArrayList<>(Arrays.asList(buildFirstCustomTypeElement(), buildSecondCustomTypeElement()));
+        return new ArrayList<>(Arrays.asList(buildFirstCustomElement(), buildSecondCustomElement()));
     }
 
-    private Map<CustomType, String> buildCustomKeyMap() {
+    private Map<CustomType, String> buildMapWithCustomKey() {
         return new HashMap<CustomType, String>() {{
-            put(buildFirstCustomTypeElement(), "mapValue");
+            put(buildFirstCustomElement(), "mapValue");
         }};
     }
 
-    private Map<String, CustomType> buildCustomValueMap() {
+    private Map<String, CustomType> buildMapWithCustomValue() {
         return new HashMap<String, CustomType>() {{
-            put("mapKey", buildFirstCustomTypeElement());
+            put("mapKey", buildFirstCustomElement());
         }};
     }
 
@@ -317,7 +317,7 @@ public class CustomConverterBeanTableSchemaTest {
         }};
     }
 
-    private CustomType buildFirstCustomTypeElement() {
+    private CustomType buildFirstCustomElement() {
       return new CustomType()
             .setBooleanAttribute(Boolean.TRUE)
             .setIntegerAttribute(1)
@@ -326,7 +326,7 @@ public class CustomConverterBeanTableSchemaTest {
             .setLocalDateAttribute(LocalDate.of(2025, 1, 1));
     }
 
-    private CustomType buildSecondCustomTypeElement() {
+    private CustomType buildSecondCustomElement() {
        return new CustomType()
             .setBooleanAttribute(Boolean.FALSE)
             .setIntegerAttribute(2)
