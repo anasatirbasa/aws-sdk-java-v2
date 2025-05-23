@@ -17,6 +17,9 @@ package software.amazon.awssdk.enhanced.dynamodb.internal.converter.string;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import software.amazon.awssdk.annotations.Immutable;
+import software.amazon.awssdk.annotations.SdkInternalApi;
+import software.amazon.awssdk.annotations.ThreadSafe;
 import software.amazon.awssdk.enhanced.dynamodb.EnhancedType;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.StringConverter;
 import software.amazon.awssdk.enhanced.dynamodb.internal.converter.StringConverterProvider;
@@ -27,7 +30,9 @@ import software.amazon.awssdk.enhanced.dynamodb.internal.converter.StringConvert
  *
  * <p>Fallback converters are cached per raw class for performance.</p>
  */
-
+@SdkInternalApi
+@ThreadSafe
+@Immutable
 public class FallbackStringConverterProvider implements StringConverterProvider {
 
     private final StringConverterProvider delegate;

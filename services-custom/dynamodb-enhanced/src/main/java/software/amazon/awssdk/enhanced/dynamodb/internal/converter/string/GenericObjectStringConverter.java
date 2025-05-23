@@ -32,7 +32,6 @@ import software.amazon.awssdk.utils.Logger;
  * This converter is useful for types that don't have built-in support and is typically used in fallback scenarios. If
  * serialization or deserialization fails, an error is logged and {@code null} is returned.
  */
-
 @SdkInternalApi
 @ThreadSafe
 @Immutable
