@@ -253,6 +253,10 @@ public class EndpointRulesSpecUtils {
     }
 
     public List<String> rulesEngineFilesFromDirectory(URL location) {
+        return rulesEngineFilesFromDirectory(location, RULES_ENGINE_RESOURCE_FILES_PREFIX);
+    }
+
+    private List<String> rulesEngineFilesFromDirectory(URL location, String resourcePrefix) {
         URI locationUri;
         try {
             locationUri = location.toURI();
@@ -268,7 +272,7 @@ public class EndpointRulesSpecUtils {
             return Files.walk(directory)
                         // Remove the root directory if the classes, paths are expected to be relative to this directory
                         .map(f -> directory.relativize(f).toString())
-                        .filter(f -> f.startsWith(RULES_ENGINE_RESOURCE_FILES_PREFIX))
+                        .filter(f -> f.startsWith(resourcePrefix))
                         .collect(Collectors.toList());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -276,7 +280,18 @@ public class EndpointRulesSpecUtils {
     }
 
     public List<String> rulesEngineResourceFiles2() {
-        URL currentJarUrl = EndpointRulesSpecUtils.class.getProtectionDomain().getCodeSource().getLocation();
+        URL codeSourceLocation = EndpointRulesSpecUtils.class.getProtectionDomain().getCodeSource().getLocation();
+        try {
+            if ("file".equals(codeSourceLocation.toURI().getScheme())
+                && Files.isDirectory(Paths.get(codeSourceLocation.toURI()))) {
+                return rulesEngineFilesFromDirectory(
+                    codeSourceLocation, "software/amazon/awssdk/codegen/rules2/");
+            }
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+
+        URL currentJarUrl = codeSourceLocation;
         try (JarFile jarFile = new JarFile(currentJarUrl.getFile())) {
             return jarFile.stream()
                           .map(ZipEntry::getName)

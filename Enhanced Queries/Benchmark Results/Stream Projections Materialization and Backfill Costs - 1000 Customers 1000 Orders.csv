@@ -1,0 +1,2 @@
+Scenario Id,Scenario,Description,DynamoDB Operations,Average Latency (ms),P50 Latency (ms),P95 Latency (ms),Rows Returned,Read Capacity Units,Write Capacity Units,DynamoDB Request Count,AWS Region,Instance Type,Customer Count,Orders Per Customer,Warmup Iterations,Measured Iterations
+projection_materialization,Materialize projection summaries,"Materializes summary and join rows before read benchmarking. Write capacity is populated when live write telemetry is enabled.",Streams apply or BatchWriteItem,1363.00,,,,,,,eu-west-1,m5.xlarge,1000,1000,3,10
